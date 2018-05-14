@@ -1,9 +1,11 @@
 package org.ntkachev.microservices.hello_world;
 
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
@@ -19,7 +21,7 @@ import java.util.List;
 
 @SpringBootApplication
 @EnableEurekaClient
-@RibbonClient(name = "say-hello", configuration = RibbonConfig.class)
+@RibbonClient(name = "say-hello"/*, configuration = RibbonConfig.class*/)
 public class HelloWorldStarter {
 
     public static void main(String[] args) {
@@ -29,6 +31,7 @@ public class HelloWorldStarter {
 
     @RestController
     @EnableDiscoveryClient
+    @EnableCircuitBreaker
     public static class HelloWorldController {
         @Autowired
         private RestTemplate restTemplate;
@@ -36,9 +39,14 @@ public class HelloWorldStarter {
         private DiscoveryClient discoveryClient;
 
         @GetMapping("/helloWorld")
+        @HystrixCommand(fallbackMethod = "reliable")
         public String hello() {
             //String response = restTemplate.getForObject("http://localhost:8080/hello?name=World", String.class);
             return this.restTemplate.getForObject("http://hello-service/hello?name=World", String.class);
+        }
+
+        public String reliable() {
+            return "Could not get response from service";
         }
     }
 
