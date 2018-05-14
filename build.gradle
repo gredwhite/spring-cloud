@@ -1,0 +1,36 @@
+buildscript {
+    ext {
+        SPRING_BOOT_VERSION = "2.0.2.RELEASE"
+    }
+
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${SPRING_BOOT_VERSION}")
+    }
+}
+
+allprojects {
+    group "org.ntkachev.microservices"
+    version "0.1"
+}
+
+subprojects {
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+
+    apply plugin: "java"
+    apply plugin: "org.springframework.boot"
+
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+
+    dependencies {
+       compile ("org.springframework.boot:spring-boot-starter-web:${SPRING_BOOT_VERSION}")
+    }
+
+}
