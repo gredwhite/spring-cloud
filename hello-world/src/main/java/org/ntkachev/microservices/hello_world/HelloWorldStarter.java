@@ -38,9 +38,7 @@ public class HelloWorldStarter {
         @GetMapping("/helloWorld")
         public String hello() {
             //String response = restTemplate.getForObject("http://localhost:8080/hello?name=World", String.class);
-            //List<ServiceInstance> clients = discoveryClient.getInstances("HELLO_WORLD_CLIENT");
-            String greeting = this.restTemplate.getForObject("http://hello-service/hello?name=World", String.class);
-            return greeting;
+            return this.restTemplate.getForObject("http://hello-service/hello?name=World", String.class);
         }
     }
 
