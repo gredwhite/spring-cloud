@@ -1,6 +1,6 @@
 spring:
   application:
-    name: hello_service
+    name: hello-service
 server:
   port: 8080
   servlet:
