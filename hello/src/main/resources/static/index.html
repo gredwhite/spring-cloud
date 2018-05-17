@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>logout page</title>
+    <script type="text/javascript" src="/client/webjars/js-cookie/js.cookie.js"></script>
+    <script type="text/javascript" src="/client/webjars/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="/client/webjars/bootstrap/js/bootstrap.min.js"></script>
+
+    <script type="text/javascript">
+        $.ajaxSetup({
+            beforeSend: function (xhr, settings) {
+                if (settings.type == 'POST' || settings.type == 'PUT'
+                    || settings.type == 'DELETE') {
+                    if (!(/^http:.*/.test(settings.url) || /^https:.*/
+                            .test(settings.url))) {
+                        // Only send the token to relative URLs i.e. locally.
+                        xhr.setRequestHeader("X-XSRF-TOKEN",
+                            Cookies.get('XSRF-TOKEN'));
+                    }
+                }
+            }
+        });
+        var logout = function () {
+            $.post("/client/logout", function () {
+                $("#user").html('');
+                $(".unauthenticated").show();
+                $(".authenticated").hide();
+            });
+            return true;
+        };
+        $(function() {
+            $("#logoutButton").on("click", function () {
+                logout();
+            });
+        });
+
+    </script>
+</head>
+<body>
+
+<h2>Hello service!!!</h2>
+<div th:text="'Hello, ' + ${name}"></div>
+
+<input type="button" id="logoutButton" value="Logout"/>
+
+
+
+</body>
+</html>

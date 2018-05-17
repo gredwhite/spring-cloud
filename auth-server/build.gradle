@@ -4,4 +4,12 @@ apply plugin: "io.spring.dependency-management"
 dependencies {
     compile('org.springframework.boot:spring-boot-starter-actuator')
     compile('org.springframework.boot:spring-boot-starter-web')
+
+    compile 'org.springframework.security.oauth.boot:spring-security-oauth2-autoconfigure:2.0.0.RELEASE'
+
+    compile('org.webjars:js-cookie:2.1.0')
+    compile('org.webjars:jquery:2.1.1')
+    compile('org.webjars:bootstrap:3.2.0')
+    compile('org.webjars:webjars-locator-core')
+
 }

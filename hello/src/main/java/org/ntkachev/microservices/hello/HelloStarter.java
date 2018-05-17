@@ -3,7 +3,11 @@ package org.ntkachev.microservices.hello;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+/*
+import org.springframework.boot.autoconfigure.security.oauth2.client.EnableOAuth2Sso;
+*/
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -17,6 +21,8 @@ import java.net.UnknownHostException;
 @SpringBootApplication
 @EnableEurekaClient
 @EnableScheduling
+//@EnableAutoConfiguration
+//@EnableOAuth2Sso
 public class HelloStarter {
 
 
@@ -33,7 +39,6 @@ public class HelloStarter {
         private Logger logger = LoggerFactory.getLogger(HelloController.class);
 
         @GetMapping("/hello")
-
         public String hello(@RequestParam("name") String name) throws UnknownHostException, InterruptedException {
             logger.info("Starting performing request: {}", InetAddress.getLocalHost());
             synchronized (this) {
