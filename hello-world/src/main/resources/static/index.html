@@ -15,14 +15,14 @@
                     if (!(/^http:.*/.test(settings.url) || /^https:.*/
                             .test(settings.url))) {
                         // Only send the token to relative URLs i.e. locally.
-                        xhr.setRequestHeader("X-XSRF-TOKEN",
+                        xhr.setRequestHeader("X-CSRF-TOKEN",
                             Cookies.get('XSRF-TOKEN'));
                     }
                 }
             }
         });
         var logout = function () {
-            $.post("/client/logout", function () {
+            $.post("/hw/logout", function () {
                 $("#user").html('');
                 $(".unauthenticated").show();
                 $(".authenticated").hide();
@@ -30,7 +30,7 @@
             return true;
         };
         var submitMsg = function () {
-            $.post("/hw/helloWorld", function (resp) {
+            $.get("/hw/helloWorld", function (resp) {
                 alert(resp);
             });
             return true;

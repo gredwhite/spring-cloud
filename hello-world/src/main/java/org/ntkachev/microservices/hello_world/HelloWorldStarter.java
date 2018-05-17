@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
-
 @SpringBootApplication
 @EnableEurekaClient
 @RibbonClient(name = "say-hello"/*, configuration = RibbonConfig.class*/)
@@ -29,6 +28,17 @@ public class HelloWorldStarter {
         SpringApplication.run(HelloWorldStarter.class, args);
     }
 
+/*    @Bean
+    @Order(1)
+    public RequestContextListener requestContextListener() {
+        return new RequestContextListener();
+    }
+
+    @Order(1)
+    @Bean
+    public RequestContextFilter requestContextFilter() {
+        return new RequestContextFilter();
+    }*/
 
     @RestController
     @EnableDiscoveryClient
@@ -42,8 +52,9 @@ public class HelloWorldStarter {
         @GetMapping("/helloWorld")
         @HystrixCommand(fallbackMethod = "reliable")
         public String hello() {
-            //String response = restTemplate.getForObject("http://localhost:8080/hello?name=World", String.class);
-            return this.restTemplate.getForObject("http://hello-service/hello?name=World", String.class);
+            //String response = restTemplate.getForObject("http://localhost:8082/h/hello?name=World", String.class);
+            return this.restTemplate.getForObject("http://hello-service/h/hello?name=World", String.class);
+
         }
 
         public String reliable() {
@@ -58,5 +69,38 @@ public class HelloWorldStarter {
         RestTemplate restTemplate() {
             return new RestTemplate();
         }
+
+/*        @Bean
+        @ConfigurationProperties("security.oauth2")
+        public ClientResources clientResources() {
+            return new ClientResources();
+        }
+
+        @Autowired
+        private OAuth2ClientContext oAuth2ClientContext;
+
+        @Bean
+        @LoadBalanced
+        public OAuth2RestTemplate oAuth2RestTemplate() {
+            return new OAuth2RestTemplate(clientResources().getClient(), oAuth2ClientContext);
+        }
+
+        class ClientResources {
+
+            @NestedConfigurationProperty
+            private AuthorizationCodeResourceDetails client = new AuthorizationCodeResourceDetails();
+
+            @NestedConfigurationProperty
+            private ResourceServerProperties resource = new ResourceServerProperties();
+
+            public AuthorizationCodeResourceDetails getClient() {
+                return client;
+            }
+
+            public ResourceServerProperties getResource() {
+                return resource;
+            }
+        }*/
     }
 }
+
