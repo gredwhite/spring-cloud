@@ -1,11 +1,15 @@
 package org.ntkachev.microservices.hello_world;
 
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.oauth2.client.EnableOAuth2Sso;
+import org.springframework.boot.autoconfigure.security.oauth2.resource.ResourceServerProperties;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.NestedConfigurationProperty;
 import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
@@ -13,9 +17,13 @@ import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.cloud.netflix.ribbon.RibbonClient;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.oauth2.client.OAuth2ClientContext;
+import org.springframework.security.oauth2.client.OAuth2RestTemplate;
+import org.springframework.security.oauth2.client.token.grant.code.AuthorizationCodeResourceDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.context.request.RequestContextListener;
 
 @SpringBootApplication
 @EnableEurekaClient
@@ -28,17 +36,11 @@ public class HelloWorldStarter {
         SpringApplication.run(HelloWorldStarter.class, args);
     }
 
-/*    @Bean
-    @Order(1)
+    @Bean
     public RequestContextListener requestContextListener() {
         return new RequestContextListener();
     }
 
-    @Order(1)
-    @Bean
-    public RequestContextFilter requestContextFilter() {
-        return new RequestContextFilter();
-    }*/
 
     @RestController
     @EnableDiscoveryClient
@@ -47,14 +49,21 @@ public class HelloWorldStarter {
         @Autowired
         private RestTemplate restTemplate;
         @Autowired
+        private OAuth2RestTemplate oAuth2RestTemplate;
+        @Autowired
         private DiscoveryClient discoveryClient;
 
         @GetMapping("/helloWorld")
-        @HystrixCommand(fallbackMethod = "reliable")
+        @HystrixCommand(groupKey = "somethingProxy", commandKey = "retrieveSomething", ignoreExceptions = {
+                IllegalArgumentException.class }, fallbackMethod = "reliable", commandProperties = {
+                @HystrixProperty(name = "execution.isolation.strategy", value = "SEMAPHORE") })
         public String hello() {
-            //String response = restTemplate.getForObject("http://localhost:8082/h/hello?name=World", String.class);
-            return this.restTemplate.getForObject("http://hello-service/h/hello?name=World", String.class);
-
+            try {
+                return this.oAuth2RestTemplate.getForObject("http://hello-service/h/hello?name=World", String.class);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
         }
 
         public String reliable() {
@@ -70,7 +79,7 @@ public class HelloWorldStarter {
             return new RestTemplate();
         }
 
-/*        @Bean
+        @Bean
         @ConfigurationProperties("security.oauth2")
         public ClientResources clientResources() {
             return new ClientResources();
@@ -100,7 +109,7 @@ public class HelloWorldStarter {
             public ResourceServerProperties getResource() {
                 return resource;
             }
-        }*/
+        }
     }
 }
 
